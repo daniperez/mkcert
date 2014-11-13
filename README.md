@@ -31,6 +31,8 @@ Default: "".
 * ```MKCERT_ORGANIZATION_UNIT```: organization unit of certificate's subject.
 Default: "".
 
+## Usage
+
 The easiest way to run this is with Docker. Assuming the CA certificate,
 key and the serial number are in ```$PWD```:
 
