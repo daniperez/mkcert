@@ -1,6 +1,6 @@
 ## Introduction 
 Creates PEM, PKCS12 and JKS (Java Keystore) certificates, signed by the given
-CA.
+CA. Uses OpenSSL and Keytool (OpenJDK 7).
 
 ## Parameters
 
