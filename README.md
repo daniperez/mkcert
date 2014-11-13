@@ -3,6 +3,7 @@ Creates PEM, PKCS12 and JKS (Java Keystore) certificates, signed by the given
 CA. Uses OpenSSL and Keytool (OpenJDK 7).
 
 Usage example (assuming ```ca.crt``` and ```ca.key``` are in ```$PWD```):
+
 ```
 docker run -it --rm -v $PWD:/certs/ -w /certs/ \
     -e MKCERT_CA=ca.crt                        \
@@ -11,6 +12,7 @@ docker run -it --rm -v $PWD:/certs/ -w /certs/ \
     -e MKCERT_COMMON_NAME="Foo"                \
     daniperez/mkcert 
 ```
+
 That command line will generate 3 certificates (.crt, .pkcs2 and .jks), a key (.key), a signing request (.csr) and it will print the password used to protect the key and the certificates.
 
 ## Parameters
