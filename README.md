@@ -32,11 +32,11 @@ The easiest way to run this is with Docker. Assuming the CA certificate,
 key and the serial number are in ```$PWD```:
 
 ```
-docker -it --rm -v $PWD:/certs/ -w /certs/ \
-    -e MKCERT_CA ca.crt                    \
-    -e MKCERT_CA_KEY ca.key                \
-    -e MKCERT_SERIAL_NUMBER 42             \
-    -e MKCERT_COMMON_NAME "Foo"            \
+docker run -it --rm -v $PWD:/certs/ -w /certs/ \
+    -e MKCERT_CA=ca.crt                        \
+    -e MKCERT_CA_KEY=ca.key                    \
+    -e MKCERT_SERIAL_NUMBER=42                 \
+    -e MKCERT_COMMON_NAME="Foo"                \
     daniperez/mkcert 
 ```
 
@@ -45,3 +45,11 @@ If you don't want to use Docker, just do:
 ```
 MKCERT_COMMON_NAME="Foo" MKCERT_CA=ca.crt MKCERT_CA_KEY=ca.key MKCERT_SERIAL_NUMBER=42 ./mkcert.py
 ```
+
+
+### Note for Fedora users
+
+If you get a SELinux error, you might need to execute the following command on
+the folder that you want to mount as volumen in the container:
+
+su -c "chcon -Rt svirt_sandbox_file_t ./"
