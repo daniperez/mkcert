@@ -2,6 +2,16 @@
 Creates PEM, PKCS12 and JKS (Java Keystore) certificates, signed by the given
 CA. Uses OpenSSL and Keytool (OpenJDK 7).
 
+Usage example:
+```
+docker run -it --rm -v $PWD:/certs/ -w /certs/ \
+    -e MKCERT_CA=ca.crt                        \
+    -e MKCERT_CA_KEY=ca.key                    \
+    -e MKCERT_SERIAL_NUMBER=42                 \
+    -e MKCERT_COMMON_NAME="Foo"                \
+    daniperez/mkcert 
+```
+
 ## Parameters
 
 ```mkcert``` accepts parameters passed as environment variables. 
