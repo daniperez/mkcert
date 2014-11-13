@@ -11,7 +11,7 @@ docker run -it --rm -v $PWD:/certs/ -w /certs/ \
     -e MKCERT_COMMON_NAME="Foo"                \
     daniperez/mkcert 
 ```
-That command line would generate 3 certificates (.crt, .pkcs2 and .jks), a key (.key), a signing request (.csr) and it will print the password used to protect the key and the certificates.
+That command line will generate 3 certificates (.crt, .pkcs2 and .jks), a key (.key), a signing request (.csr) and it will print the password used to protect the key and the certificates.
 
 ## Parameters
 
