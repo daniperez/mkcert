@@ -1,8 +1,11 @@
+## Introduction 
 Creates PEM, PKCS12 and JKS (Java Keystore) certificates, signed by the given
 CA.
 
-Parameters can be passed as environment variables. The mandatory ones
-are:
+## Parameters
+
+```mkcert``` accepts parameters passed as environment variables. 
+The **mandatory** ones are:
 
 * ```MKCERT_COMMON_NAME```: name of the certificate's subject.
 * ```MKCERT_CA```: file containing the CA certificate used to 
@@ -46,6 +49,34 @@ If you don't want to use Docker, just do:
 MKCERT_COMMON_NAME="Foo" MKCERT_CA=ca.crt MKCERT_CA_KEY=ca.key MKCERT_SERIAL_NUMBER=42 ./mkcert.py
 ```
 
+You'll see some things going on but at the end, and most important, you'll
+get a summary if it succeeded to create the certificate:
+
+```
+(...)
+=======
+Summary
+=======
+
+ - Certificate            : Foo.crt
+ - Certificate (pkcs12)   : Foo.p12
+ - Certificate (keystore) : Foo.jks
+ - Key file               : Foo.key
+ - Validity               : 999 days 
+ - Password               : BnlrSlkds
+ ```
+
+And _**pay attention to the final remarks!**_:
+
+```
+   NOTE: the same password is used for: 'Foo.p12', 'Foo.key' and 'Foo.jks'.
+WARNING: remember to save serial number '42', or two certificates
+         could get the same serial number in the future.
+WARNING: store the certificates and the password in a safe place!
+         Don't be the weakest link!
+```
+
+**Pay attention to the warnings** at the end of the summary!
 
 ### Note for Fedora users
 
