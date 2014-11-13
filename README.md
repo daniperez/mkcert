@@ -83,4 +83,6 @@ WARNING: store the certificates and the password in a safe place!
 If you get a SELinux error, you might need to execute the following command on
 the folder that you want to mount as volumen in the container:
 
+```
 su -c "chcon -Rt svirt_sandbox_file_t ./"
+```
