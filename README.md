@@ -76,9 +76,7 @@ WARNING: store the certificates and the password in a safe place!
          Don't be the weakest link!
 ```
 
-**Pay attention to the warnings** at the end of the summary!
-
-### Note for Fedora users
+### Note for Fedora & Docker users
 
 If you get a SELinux error, you might need to execute the following command on
 the folder that you want to mount as volumen in the container:
