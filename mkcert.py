@@ -37,6 +37,7 @@ if __name__ == "__main__":
     # Whether the certificate is for a CA or not.
     is_ca = os.getenv("MKCERT_MAKE_CA", "False").lower() not in (
         "false", "0", "f", "no")
+    ca_config = os.getenv("MKCERT_CA_CONF", "/app/ca.cnf")
 
     # Certificate subject (DN)
     country_code = os.getenv("MKCERT_COUNTRY", "US")
@@ -90,10 +91,10 @@ if __name__ == "__main__":
         print "======================================="
         not os.system(
             "openssl ca -create_serial -days %s -batch "
-            "-policy policy_anything -extensions v3_ca -config ca.cnf "
+            "-policy policy_anything -extensions v3_ca -config %s "
             "-cert %s -keyfile %s -outdir . "
             "-out '%s.crt' -infiles '%s.csr'" % (
-                validity_days, ca, ca_key, common_name,
+                validity_days, ca_config, ca, ca_key, common_name,
                 common_name)) or fail()
 
     else:
