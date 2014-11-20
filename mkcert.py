@@ -3,24 +3,13 @@
 import os
 import sys
 import base64
+import random
 
 #
 # This tool creates client certificates. The process to create a
 # server certificate is the same, there aren't any differences
 # between client and server certificates, other than that the server
-# won't # need probably the p12 and jks certificates.
-#
-# If you want to create a CA for testing (and use self-signed
-# certificates), you can create it as follows:
-#
-# > openssl genrsa 1024 > ca.key
-# > openssl req -new -newkey rsa:1024 -x509 -days 365 \
-#   -key ca.key -out ca.crt
-#
-# Or in one step:
-#
-# > openssl req -new -newkey rsa:1024 -x509 -days 365 \
-#   -keyout ca.key -out ca.crt
+# won't need probably the p12 and jks certificates.
 #
 
 
@@ -38,8 +27,18 @@ def random_string(N=9):
 
 if __name__ == "__main__":
 
-    key_length = os.getenv("MKCERT_KEY_LENGTH", "2048")
-    validity = os.getenv("MKCERT_VALIDITY", "365")
+    # Length of the key in bits
+    key_length = os.getenv("MKCERT_KEY_LENGTH_BITS", "2048")
+    # Validity in days
+    validity_days = os.getenv("MKCERT_VALIDITY_DAYS", "365")
+    # Serial number of the certificate
+    serial_number = os.getenv("MKCERT_SERIAL_NUMBER",
+                              "%s" % random.randint(0, 1 << 32))
+    # Whether the certificate is for a CA or not.
+    is_ca = os.getenv("MKCERT_MAKE_CA", "False").lower() not in (
+        "false", "0", "f", "no")
+
+    # Certificate subject (DN)
     country_code = os.getenv("MKCERT_COUNTRY", "US")
     state = os.getenv("MKCERT_STATE", "CA")
     location = os.getenv("MKCERT_LOCATION", "San Francisco")
@@ -48,9 +47,8 @@ if __name__ == "__main__":
                                   "Important Matters Group")
 
     common_name = os.environ["MKCERT_COMMON_NAME"]
-    ca = os.environ["MKCERT_CA"]
-    ca_key = os.environ["MKCERT_CA_KEY"]
-    serial_number = os.environ["MKCERT_SERIAL_NUMBER"]
+    ca = os.environ["MKCERT_SIGNING_CA"]
+    ca_key = os.environ["MKCERT_SIGNING_CA_KEY"]
 
     password = random_string()
 
@@ -70,23 +68,52 @@ if __name__ == "__main__":
         % (key_length, subject, common_name,
            common_name, password)) or fail()
 
-    print "============================================"
-    print "Creating and signing certificate with the CA"
-    print " (the password of the CA can be requested) "
-    print "============================================"
-    if os.path.isfile(serial_number):
-        serial_switch = "-CAserial %s" % serial_number
-    else:
-        serial_switch = "-set_serial %s" % serial_number
+    if is_ca:
+        if os.path.isfile(serial_number):
+            if serial_number != "ca.serial":
+                not os.system("cat %s > ca.serial"
+                              % serial_number) or fail()
+        elif serial_number.isdigit():
+            not os.system("echo %s > ca.serial"
+                          % serial_number) or fail()
+        else:
+            print("Invalid serial number, it's not a number or "
+                  "file [%s] doesn't exist or it isn't valid." % serial_number)
+            fail()
 
-    not os.system(
-        "openssl x509 -req -days %s "
-        "-in '%s.csr' "
-        "-CA %s -CAkey %s "
-        "%s "
-        "-out '%s.crt'" % (
-            validity, common_name, ca, ca_key,
-            serial_switch, common_name)) or fail()
+        not os.system("touch ca.index") or fail()
+
+        print "======================================="
+        print "Creating and signing a CA certificate  "
+        print " (the password of the signing CA can be"
+        print "  requested)                           "
+        print "======================================="
+        not os.system(
+            "openssl ca -create_serial -days %s -batch "
+            "-policy policy_anything -extensions v3_ca -config ca.cnf "
+            "-cert %s -keyfile %s -outdir . "
+            "-out '%s.crt' -infiles '%s.csr'" % (
+                validity_days, ca, ca_key, common_name,
+                common_name)) or fail()
+
+    else:
+        print "============================================"
+        print "Creating and signing certificate with the CA"
+        print " (the password of the CA can be requested) "
+        print "============================================"
+        if os.path.isfile(serial_number):
+            serial_switch = "-CAserial %s" % serial_number
+        else:
+            serial_switch = "-set_serial %s" % serial_number
+
+        not os.system(
+            "openssl x509 -req -days %s "
+            "-in '%s.csr' "
+            "-CA %s -CAkey %s "
+            "%s "
+            "-out '%s.crt'" % (
+                validity_days, common_name, ca, ca_key,
+                serial_switch, common_name)) or fail()
 
     print "================================================="
     print "Exporting a pkcs12 certificate (e.g. for Firefox)"
@@ -124,7 +151,8 @@ if __name__ == "__main__":
     print " - Certificate (pkcs12)   : %s.p12" % common_name
     print " - Certificate (keystore) : %s.jks" % common_name
     print " - Key file               : %s.key" % common_name
-    print " - Validity               : %s days " % validity
+    print " - Validity               : %s days " % validity_days
+    print " - Serial number          : %s " % serial_number
     print " - Password               : %s" % password
     print ""
     print("WARNING: the same password is used for: "

@@ -21,21 +21,18 @@ That command line will generate 3 certificates (.crt, .pkcs2 and .jks), a key (.
 The **mandatory** ones are:
 
 * ```MKCERT_COMMON_NAME```: name of the certificate's subject.
-* ```MKCERT_CA```: file containing the CA certificate used to 
+* ```MKCERT_SIGNING_CA```: file containing the CA certificate used to 
 sign the certificates being generated. The path has to be valid within
 the Docker container if Docker is used (see example below).
-* ```MKCERT_CA_KEY```: file containing the key for the previous certificate.
+* ```MKCERT_SIGNING_CA_KEY```: file containing the key for the previous certificate.
 The path has to be valid within the Docker container if Docker is used
 (see example below).
-* ```MKCERT_SERIAL_NUMBER```: file containing the next serial number to use
-or just a number to use. If a file is supplied, it has to be valid within the
-Docker container if Docker is used (see example below).
 
 Other accepted parameters are:
 
-* ```MKCERT_KEY_LENGTH```: length in bits of the key to be generated. 
+* ```MKCERT_KEY_LENGTH_BITS```: length in bits of the key to be generated. 
 Default: 2048.
-* ```MKCERT_VALIDITY```: days the certificate will be valid. Default: 365.
+* ```MKCERT_VALIDITY_DAYS```: days the certificate will be valid. Default: 365.
 * ```MKCERT_COUNTRY```: country of certificate's subject. Default: "".
 * ```MKCERT_STATE```: country of certificate's subject. Default: "".
 * ```MKCERT_LOCATION```: location of certificate's subject. Default: "".
@@ -43,6 +40,11 @@ Default: 2048.
 Default: "".
 * ```MKCERT_ORGANIZATION_UNIT```: organization unit of certificate's subject.
 Default: "".
+* ```MKCERT_SERIAL_NUMBER```: file containing the next serial number to use
+or just a number to use. If a file is supplied, it has to be valid within the
+Docker container if Docker is used (see example below).
+* ```MKCERT_MAKE_CA```: whether to create a certificate for a CA or a simple
+certificate. Default: "False".
 
 ## Usage
 
@@ -91,7 +93,34 @@ WARNING: store the certificates and the password in a safe place!
          Don't be the weakest link!
 ```
 
-### Note for Fedora & Docker users
+### Common errors
+
+### Duplicate CA certificates
+
+If you try to issue a CA certificate twice with the same
+input parameters, you'll get the following:
+```
+failed to update database
+TXT_DB error number 2
+error: the certificate creation didn't succeed.
+```
+It suffices to change the CN of the CA your are creating or
+remove the duplicate from the ```ca.index``` file.
+
+### More duplicates
+
+If you create 2 certificates with the same CN, they will use
+the same ```.jks``` file. Keytool will try to update the keystore
+with the same name but since we used another password to
+write it the first time, it will fail with the following error:
+```
+keytool error: java.io.IOException: Keystore was tampered with, or password was incorrect
+error: the certificate creation didn't succeed.
+```
+Just use another CN or remove the existing jks file if it's not used anymore.
+
+
+### Fedora, SELinux & Docker cocktail 
 
 If you get a SELinux error, you might need to execute the following command on
 the folder that you want to mount as volumen in the container:
