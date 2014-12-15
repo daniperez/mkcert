@@ -6,8 +6,8 @@ Usage example (assuming ```ca.crt``` and ```ca.key``` are in ```$PWD```):
 
 ```
 docker run -it --rm -v $PWD:/certs/ -w /certs/ \
-    -e MKCERT_CA=ca.crt                        \
-    -e MKCERT_CA_KEY=ca.key                    \
+    -e MKCERT_CA="ca.crt"                      \
+    -e MKCERT_CA_KEY="ca.key"                  \
     -e MKCERT_SERIAL_NUMBER=42                 \
     -e MKCERT_COMMON_NAME="Foo"                \
     daniperez/mkcert 
