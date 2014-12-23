@@ -45,6 +45,8 @@ or just a number to use. If a file is supplied, it has to be valid within the
 Docker container if Docker is used (see example below).
 * ```MKCERT_MAKE_CA```: whether to create a certificate for a CA or a simple
 certificate. Default: "False".
+* ```MKCERT_CA_CONF```: if ```MKCERT_MAKE_CA``` is true, this variable points to
+the desired CA conf file to be used when creating a CA certificate.
 
 ## Usage
 
